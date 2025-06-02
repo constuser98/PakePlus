@@ -1,22 +1,336 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="styles.css" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus App</title>
-        <script type="module" src="/main.js" defer></script>
-    </head>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>游戏记录器</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007bff"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="apple-touch-icon" href="assets/icons/tubiao.png">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <button class="header-btn back-btn" style="display: none;">←</button>
+            <h1 id="pageTitle">首页</h1>
+            <div class="search-input-container" style="display: none;">
+                <input type="text" id="appSearchInput" placeholder="搜索已添加的游戏...">
+                <button class="header-btn close-search-btn">✕</button>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn search-btn">🔍</button>
+                <button class="header-btn notification-btn">🔔</button>
+                <button class="header-btn save-btn" style="display: none;">✓</button>
+            </div>
+        </header>
 
-    <body>
-        <main class="container">
-            <h1>Welcome to PakePlus</h1>
+        <main class="app-content">
+            <!-- 搜索结果页 -->
+            <div id="searchResultsPage" class="page">
+                <div class="content-area">
+                    <h2>搜索结果</h2>
+                    <div id="searchResultsContainer" class="home-game-grid">
+                        <!-- 搜索结果将由JS动态渲染到这里 -->
+                    </div>
+                    <p id="noSearchResults" style="display: none;">未找到匹配的游戏。</p>
+                </div>
+            </div>
 
-            <form class="row" id="greet-form">
-                <input id="greet-input" placeholder="Enter a name..." />
-                <button type="submit">Greet</button>
-            </form>
-            <p id="greet-msg"></p>
+            <!-- 首页 -->
+            <div id="homePage" class="page active">
+                <div class="home-filters">
+                    <select id="homeRatingFilter">
+                        <option value="">所有星级</option>
+                        <option value="5">五星</option>
+                        <option value="4">四星</option>
+                        <option value="3">三星</option>
+                        <option value="2">二星</option>
+                        <option value="1">一星</option>
+                        <option value="0">未评星</option>
+                    </select>
+                    <select id="homeYearFilter">
+                        <option value="">所有年份</option>
+                        <!-- 年份选项将由JS动态填充 -->
+                    </select>
+                    <select id="homeTypeFilter">
+                        <option value="">所有类型</option>
+                        <!-- 类型选项将由JS动态填充 (使用customTags) -->
+                    </select>
+                </div>
+                <div class="home-game-grid content-area">
+                    <!-- 游戏列表将由JS动态渲染到这里 -->
+                </div>
+            </div>
+
+            <!-- 游戏库 -->
+            <div id="libraryPage" class="page">
+                <div class="search-filter-container">
+                    <input type="text" id="searchInput" placeholder="搜索游戏名称...">
+                    <select id="platformFilter">
+                        <option value="">所有平台</option>
+                        <option value="Nintendo Switch">Nintendo Switch</option>
+                        <option value="PlayStation">PlayStation</option>
+                        <option value="Xbox">Xbox</option>
+                        <option value="PC">PC</option>
+                        <option value="Mobile">Mobile</option>
+                    </select>
+                    <select id="statusFilter">
+                        <option value="">所有状态</option>
+                        <option value="进行中">进行中</option>
+                        <option value="已完成">已完成</option>
+                        <option value="已暂停">已暂停</option>
+                        <option value="已放弃">已放弃</option>
+                        <option value="计划中">计划中</option>
+                    </select>
+                    <select id="tagFilter">
+                        <option value="">所有标签</option>
+                        <!-- 标签将由JS动态填充 -->
+                    </select>
+                    <button id="applyFilterBtn" class="btn-primary">筛选</button>
+                    <button id="resetFilterBtn">重置</button>
+                </div>
+                <p>这里是游戏库页面内容。</p>
+
+            </div>
+
+            <!-- 添加游戏 -->
+            <div id="addGamePage" class="page">
+                <form id="addGameForm">
+                    <div class="form-group upload-placeholder">
+                        <img src="https://via.placeholder.com/300x150.png?text=点击上传游戏封面图片" alt="上传封面" id="coverPreview">
+                        <input type="file" id="gameCover" accept="image/*" style="display: none;">
+                        <label for="gameCover" class="upload-label">点击上传游戏封面图片</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameName">游戏名称</label>
+                        <input type="text" id="gameName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gamePlatform">游戏平台</label>
+                        <select id="gamePlatform">
+                            <option>Nintendo Switch</option>
+                            <option>PlayStation</option>
+                            <option>Xbox</option>
+                            <option>PC</option>
+                            <option>Mobile</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameTypeSelect">游戏类型</label>
+                        <select id="gameTypeSelect">
+                            <!-- 游戏类型选项将由JS动态填充 -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="releaseDate">发行日期</label>
+                        <input type="date" id="releaseDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="developer">开发商</label>
+                        <input type="text" id="developer">
+                    </div>
+                    <div class="form-group">
+                        <label for="gameRating">游戏评分 (1-10)</label>
+                        <input type="number" id="gameRating" min="1" max="10" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="gameStatus">游戏状态</label>
+                        <select id="gameStatus">
+                            <option>进行中</option>
+                            <option>已完成</option>
+                            <option>已暂停</option>
+                            <option>已放弃</option>
+                            <option>计划中</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameProgress">游戏进度 (%)</label>
+                        <input type="range" id="gameProgress" min="0" max="100" value="0">
+                        <span id="progressValue">0%</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="playTime">游玩时长 (小时)</label>
+                        <input type="number" id="playTime" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="gameSummary">游戏备注</label>
+                        <textarea id="gameSummary" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">保存游戏</button>
+                </form>
+            </div>
+
+            <!-- 统计 -->
+            <div id="statsPage" class="page">
+                <div class="stats-card">
+                    <h4>游戏类型分布</h4>
+                    <div style="height: 300px;"> <!-- Set a fixed height for the chart container -->
+                         <canvas id="genreDistributionChart"></canvas>
+                    </div> 
+                </div>
+                <div class="stats-card">
+                    <h4>平台分布</h4>
+                    <div class="platform-stats">
+                        <div>🎮 PlayStation: <span id="psCount">15</span></div>
+                        <div>❎ Xbox: <span id="xboxCount">8</span></div>
+                        <div>🔴 Switch: <span id="switchCount">12</span></div>
+                        <div>💻 PC: <span id="pcCount">7</span></div>
+                    </div>
+                </div>
+                 <div class="stats-card">
+                    <h4>游戏状态</h4>
+                    <div class="status-stats">
+                        <div>✔️ 进行中: <span id="statusInProgress">8</span></div>
+                        <div>🏁 已完成: <span id="statusCompleted">15</span></div>
+                        <div>⏸️ 已暂停: <span id="statusPaused">5</span></div>
+                        <div>❌ 已放弃: <span id="statusAbandoned">3</span></div>
+                        <div>📅 计划中: <span id="statusPlanned">11</span></div>
+                    </div>
+                </div>
+                <div class="stats-card">
+                    <h4>游玩时长统计</h4>
+                     <div class="playtime-stats">
+                        <div>本周: <span id="timeWeekly">12</span>小时</div>
+                        <div>本月: <span id="timeMonthly">45</span>小时</div>
+                        <div>本季度: <span id="timeQuarterly">120</span>小时</div>
+                        <div>今年: <span id="timeYearly">520</span>小时</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 我的/设置 -->
+            <div id="settingsPage" class="page">
+                <div class="settings-group">
+                    <h4>应用设置</h4>
+                    <div class="settings-item" data-page-target="themeSettingsPage">主题设置</div>
+                    <div class="settings-item" data-page-target="languageSettingsPage">语言 <span class="setting-value">简体中文</span></div>
+                    <div class="settings-item">深色模式 <label class="switch"><input type="checkbox" id="darkModeToggleInput"><span class="slider round"></span></label></div>
+                    <div class="settings-item" id="exportDataBtn" data-page-target="exportDataPage">导出数据</div>
+                    <div class="settings-item" data-page-target="importDataPage">
+                        <label for="importDataInput" class="import-data-label">导入数据</label>
+                        <input type="file" id="importDataInput" accept=".json" style="display: none;">
+                    </div>
+                </div>
+                 <div class="settings-group">
+                    <h4>游戏设置</h4>
+                    <div class="settings-item" id="manageGameDataBtn" data-page-target="gameDataManagementPage">游戏数据管理</div>
+                    <div class="settings-item" id="managePlatformsBtn" data-page-target="platformManagementPage">游戏平台管理</div>
+                    <div class="settings-item" id="manageCustomTagsBtn" data-page-target="customTagManagementPage">自定义游戏标签管理</div>
+                </div>
+                <div class="settings-group">
+                    <h4>关于与支持</h4>
+                    <div class="settings-item" data-page-target="aboutPage">关于应用</div>
+                    <div class="settings-item" data-page-target="helpFeedbackPage">帮助与反馈</div>
+                </div>
+            </div>
+
+            <!-- 游戏数据管理页面 -->
+            <div id="gameDataManagementPage" class="page">
+                <h2>游戏数据管理</h2>
+                <p>这里将管理所有游戏数据，例如批量编辑、删除等。</p>
+                <!-- 更多内容待添加 -->
+            </div>
+
+            <!-- 游戏平台管理页面 -->
+            <div id="platformManagementPage" class="page">
+                <div class="content-area">
+                    <h2>游戏平台管理</h2>
+                    <div class="management-list-container">
+                        <ul id="platformList" class="management-list">
+                            <!-- 平台列表将由JS动态填充 -->
+                        </ul>
+                    </div>
+                    <div class="add-item-form">
+                        <input type="text" id="newPlatformInput" placeholder="输入新平台名称">
+                        <button id="addPlatformBtn" class="btn-primary">添加平台</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 自定义游戏标签管理页面 -->
+            <div id="customTagManagementPage" class="page">
+                <div class="content-area">
+                    <h2>自定义游戏标签管理</h2>
+                    <div class="management-list-container">
+                        <ul id="customTagList" class="management-list">
+                            <!-- 自定义标签列表将由JS动态填充 -->
+                        </ul>
+                    </div>
+                    <div class="add-item-form">
+                        <input type="text" id="newCustomTagInput" placeholder="输入新标签名称">
+                        <button id="addCustomTagBtn" class="btn-primary">添加标签</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 游戏详情页 (动态加载) -->
+            <div id="gameDetailPage" class="page">
+                <img id="detailCover" src="" alt="Game Cover" class="detail-cover-img">
+                <h2 id="detailName"></h2>
+                <div class="tags" id="detailTags"></div>
+                <p><strong>发行日期:</strong> <span id="detailReleaseDate"></span></p>
+                <p><strong>开发商:</strong> <span id="detailDeveloper"></span></p>
+                <p><strong>平台:</strong> <span id="detailPlatform"></span></p>
+                <p><strong>评分:</strong> ⭐ <span id="detailRating"></span></p>
+                <div class="progress-bar-container">
+                    <div id="detailProgressBar" class="progress-bar"></div>
+                </div>
+                <p><strong>游戏进度:</strong> <span id="detailProgress"></span>%</p>
+                <p><strong>游玩时长:</strong> <span id="detailPlayTime"></span> 小时</p>
+                
+                <div class="actions">
+                    <button id="logPlayBtn">记录游玩</button>
+                    <button id="editGameBtn">编辑</button>
+                </div>
+
+                <h3>游玩简介</h3>
+                <p id="detailSummary"></p>
+
+                <h3>游玩记录</h3>
+                <div id="playLogContainer">
+                    <!-- 游玩记录条目 -->
+                </div>
+            </div>
+
+            <!-- 关于应用页面 -->
+            <div id="aboutPage" class="page content-area">
+                <p>这是一款本地离线应用记录你游玩过的游戏。</p>
+                <p>感谢你的使用也感谢Yuki大王的支持。</p>
+            </div>
+
+            <!-- 帮助与反馈页面 -->
+            <div id="helpFeedbackPage" class="page content-area">
+                <p>如有问题请发邮件到 227032231@qq.com</p>
+            </div>
+
         </main>
-    </body>
+
+        <nav class="bottom-nav">
+            <button data-page="homePage" class="nav-item active">
+                <span class="icon">🏠</span>
+                <span>首页</span>
+            </button>
+            <button data-page="libraryPage" class="nav-item">
+                <span class="icon">📚</span>
+                <span>游戏库</span>
+            </button>
+            <button data-page="addGamePage" class="nav-item add-item">
+                <span class="icon">➕</span>
+                <span>添加</span>
+            </button>
+            <button data-page="statsPage" class="nav-item">
+                <span class="icon">📊</span>
+                <span>统计</span>
+            </button>
+            <button data-page="settingsPage" class="nav-item">
+                <span class="icon">⚙️</span>
+                <span>我的</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="script.js"></script>
+</body>
 </html>
