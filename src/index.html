@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>游戏记录器</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="src/styles/main.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007bff"/>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -20,8 +20,10 @@
                 <button class="header-btn close-search-btn">✕</button>
             </div>
             <div class="header-actions">
-                <button class="header-btn search-btn">🔍</button>
-                <button class="header-btn notification-btn">🔔</button>
+                <div class="header-icons-group">
+                    <button class="header-btn search-btn">🔍</button>
+                    <button class="header-btn notification-btn">🔔</button>
+                </div>
                 <button class="header-btn save-btn" style="display: none;">✓</button>
             </div>
         </header>
@@ -91,8 +93,9 @@
                     <button id="applyFilterBtn" class="btn-primary">筛选</button>
                     <button id="resetFilterBtn">重置</button>
                 </div>
-                <p>这里是游戏库页面内容。</p>
-
+                <div id="libraryGameGrid" class="home-game-grid">
+                    <!-- 游戏列表将由JS动态渲染到这里 -->
+                </div>
             </div>
 
             <!-- 添加游戏 -->
@@ -162,6 +165,44 @@
                 </form>
             </div>
 
+            <!-- 游戏详情页 -->
+            <div id="gameDetailsPage" class="page">
+                <div class="game-details-container">
+                    <img id="detailGameCover" src="" alt="游戏封面" class="detail-cover">
+                    <h2 id="detailGameName"></h2>
+                    <div class="detail-item">
+                        <span>发行日期:</span> <span id="detailReleaseDate"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span>开发商:</span> <span id="detailDeveloper"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span>平台:</span> <span id="detailPlatform"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span>评分:</span> <span id="detailRating" class="rating-stars"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span>游戏进度:</span> <span id="detailProgress"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span>游玩时长:</span> <span id="detailPlaytime"></span>
+                    </div>
+                    <button id="logPlayBtn" class="btn-primary">记录游玩</button>
+                    <button id="editGameBtn" class="btn-primary">编辑</button>
+                    <div class="detail-section">
+                        <h3>游戏简介</h3>
+                        <p id="detailDescription"></p>
+                    </div>
+                    <div class="detail-section">
+                        <h3>游玩记录</h3>
+                        <ul id="detailPlayRecordsList" class="play-records-list">
+                            <!-- 游玩记录将由JS动态渲染到这里 -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <!-- 统计 -->
             <div id="statsPage" class="page">
                 <div class="stats-card">
@@ -223,6 +264,43 @@
                     <h4>关于与支持</h4>
                     <div class="settings-item" data-page-target="aboutPage">关于应用</div>
                     <div class="settings-item" data-page-target="helpFeedbackPage">帮助与反馈</div>
+                </div>
+            </div>
+
+            <!-- 主题设置页面 -->
+            <div id="themeSettingsPage" class="page">
+                <h2>主题设置</h2>
+                <div class="unfinished-notice">
+                    <div class="notice-icon">🚧</div>
+                    <div class="notice-content">
+                        <h3>功能开发中</h3>
+                        <p>主题设置功能正在开发中，敬请期待！</p>
+                        <p>未来将支持：</p>
+                        <ul>
+                            <li>多种主题色彩选择</li>
+                            <li>自定义渐变背景</li>
+                            <li>个性化界面布局</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 语言设置页面 -->
+            <div id="languageSettingsPage" class="page">
+                <h2>语言设置</h2>
+                <div class="unfinished-notice">
+                    <div class="notice-icon">🌐</div>
+                    <div class="notice-content">
+                        <h3>功能开发中</h3>
+                        <p>多语言支持功能正在开发中，敬请期待！</p>
+                        <p>计划支持的语言：</p>
+                        <ul>
+                            <li>简体中文（当前）</li>
+                            <li>繁体中文</li>
+                            <li>English</li>
+                            <li>日本語</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -297,7 +375,7 @@
             <!-- 关于应用页面 -->
             <div id="aboutPage" class="page content-area">
                 <p>这是一款本地离线应用记录你游玩过的游戏。</p>
-                <p>感谢你的使用也感谢Yuki大王的支持。</p>
+                <p>感谢你的使用也感谢。</p>
             </div>
 
             <!-- 帮助与反馈页面 -->
@@ -331,6 +409,6 @@
         </nav>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="src/script.js"></script>
 </body>
 </html>
