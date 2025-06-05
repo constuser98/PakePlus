@@ -1,9 +1,9 @@
-const CACHE_NAME = 'game-logger-cache-v2';
+const CACHE_NAME = 'game-logger-cache-v4';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/style.css',
-  '/script.js',
+  '/src/styles/main.css',
+  '/src/script.js',
   '/manifest.json',
   // Add paths to your icons here, ensure they match manifest.json and are in assets/icons/
   // It's better to list them individually or use a build tool to generate this list.
