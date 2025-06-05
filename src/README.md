@@ -50,8 +50,15 @@ e:\test trae/
 │   └── icons/
 │       └── icon-192x192.png  (示例 PWA 图标, 应添加更多尺寸)
 ├── index.html              (主 HTML 文件)
-├── style.css               (CSS 样式文件)
-├── script.js               (JavaScript 逻辑文件)
+├── src/
+│   ├── components/         (可复用 UI 组件)
+│   ├── data/               (数据模型和管理)
+│   ├── pages/              (页面逻辑)
+│   ├── services/           (数据服务和 API 交互)
+│   ├── styles/             (样式文件)
+│   │   └── main.css        (主 CSS 样式文件)
+│   └── utils/              (通用工具函数)
+│   └── script.js           (主入口文件，协调各模块)
 ├── manifest.json           (PWA manifest 文件)
 ├── service-worker.js       (Service Worker 脚本)
 └── README.md               (本项目说明文件)
